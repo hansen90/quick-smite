@@ -1,0 +1,123 @@
+<body>
+    <top-bar>
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="#/todo">My Site</a></h1>
+            </li>
+            <li toggle-top-bar class="menu-icon"><a href="#">Menu</a>
+            </li>
+        </ul>
+
+        <top-bar-section>
+            <!-- Right Nav Section -->
+            <ul class="right">
+                <li class="active"><a href="#">Active</a>
+                </li>
+                <li has-dropdown>
+                    <a href="#">Dropdown</a>
+                    <ul top-bar-dropdown>
+                        <li><a href="#">First link in dropdown</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Left Nav Section -->
+            <ul class="left">
+                <li><a href="#">Left</a>
+                </li>
+            </ul>
+        </top-bar-section>
+    </top-bar>
+
+    <table class="large-6 columns large-offset-3">
+        <thead>
+            <tr>
+                <th width="200">Summoner ID</th>
+                <th width="200">Summoner Name</th>
+                <th width="200">Profile Icon</th>
+                <th width="200">Summoner Level</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{summonerDatas[result].id}}</td>
+                <td>{{summonerDatas[result].name}}</td>
+                <td>
+                    <div id="something"></div>
+                </td>
+                <td>{{summonerDatas[result].summonerLevel}}</td>
+        </tbody>
+    </table>
+<br>
+
+    <!--     <table>
+        <thead>
+            <tr>
+                <th ng-repeat="(key, value) in pastGameInfos[0]" width="200">{{key}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td ng-repeat="(key, value) in pastGameInfos[0]">{{value}}</td>
+            </tr>
+        </tbody>
+    </table> -->
+    <!--     <table>
+        <thead>
+            <tr>
+                <th ng-repeat="(key, value) in pastGameInfos" ng-show="key != 'participantIdentities' && key != 'participants'" width="200">{{key}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td ng-repeat="(key, value) in pastGameInfos" ng-show="key != 'participantIdentities' && key != 'participants'">{{value}}</td>
+            </tr>
+        </tbody>
+    </table>
+ -->
+<!--     <table>
+        <thead>
+            <tr>
+                <th ng-repeat="(key, value) in participantData" width="200">{{key}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td ng-repeat="(key, value) in participantData">{{value}}</td>
+                <div id="spells" ng-show="key =='spell1Id'"></div>
+            </tr>
+        </tbody>
+    </table> -->
+
+    <table class="responsive-summoner" ng-repeat="gameInfo in pastGameInfos track by $index" class="large-6 large-centered column">
+        <thead>
+            <tr>
+                <th width="200">Game Mode</th>
+                <th width="200">Champion ID</th>
+                <th width="200">Rank</th>
+                <th width="200">Spell 1</th>
+                <th width="200">Spell 2</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <pre ng-bind="gameInfo | json"></pre>
+            </tr>
+            <tr>
+                <td ng-bind="secondDataSet.queueType"></td>
+                <td>
+                    <img ng-if="!!championNames[$index]" ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/{{championNames[$index]}}.png" />
+                </td>
+                <td>{{participantData.highestAchievedSeasonTier}}</td>
+                <td>
+                    <img ng-if="!!spell1Names[$index]" ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/spell/{{spell1Names[$index]}}.png" />
+                </td>
+                <td>
+                   <img ng-if="!!spell2Names[$index]" ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/spell/{{spell2Names[$index]}}.png" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>

@@ -1,0 +1,86 @@
+<!-- <h3>Todo</h3>
+<ul class="todo-list">
+  <li class="todo-item" ng-repeat="todo in todos" ng-class="{'todo-done': todo.isDone}">
+    <label><input type="checkbox" ng-click="check()" ng-model="todo.isDone"/>&nbsp;{{todo.label}}</label>
+  </li>
+  <li class="todo-item">
+    <form ng-submit="add()">
+      <input type="text" placeholder="New item..." ng-model="label"/>
+      <button type="submit" ng-disabled="posting || !label">Add</button>
+    </form>
+  </li>
+</ul> -->
+
+<body>
+    <top-bar>
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="#/todo">QuickSmite</a></h1>
+            </li>
+            <li toggle-top-bar class="menu-icon"><a href="#">Menu</a>
+            </li>
+        </ul>
+
+        <top-bar-section>
+            <!-- Right Nav Section -->
+            <ul class="right">
+                <li class="active"><a href="#">Active</a>
+                </li>
+                <li has-dropdown>
+                    <a href="#">Dropdown</a>
+                    <ul top-bar-dropdown>
+                        <li><a href="#">First link in dropdown</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+<!--             Left Nav Section
+            <ul class="left">
+                <li><a href="#">Left</a>
+                </li>
+            </ul> -->
+        </top-bar-section>
+    </top-bar>
+
+    <!--     <header>
+        <div class="row">
+            <div class="large-12 column">
+                <img src="http://placehold.it/1500x400&text=[stuff and img]">
+            </div>
+        </div>
+    </header> -->
+    <br>
+    <br>
+    <br>
+    <br>
+
+
+    <!--     <form ng-submit="goNext()">
+        <div class="row">
+            <div class="large-8 columns">
+                <label>Input
+                    <input type="text" placeholder="Enter Summonder Name" name="summonerName" ng-model="formData.summonerName" />
+                </label>
+            </div>
+        </div>
+        <button type="submit" ng-disabled="posting || !formData.summonerName">Search</button>
+    </form> -->
+
+    <div class="row">
+        <div class="large-6 columns large-offset-3">
+            <div class="row collapse prefix-round">
+                <div class="small-3 columns">
+                    <button ng-click="goNext()" class="button prefix">Go</button>
+                </div>
+                <div class="small-9 columns">
+                    <input type="text" placeholder="Enter Summoner Name" name="summonerName" ng-model="formData.summonerName" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <pre>
+      {{formData}}
+    </pre>
+</body>
