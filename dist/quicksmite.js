@@ -94,25 +94,11 @@ angular
             $scope.summonerDatas = response.data;
             console.log('data 2 is: ', $scope.summonerDatas);
             //console.log('id is: ', $scope.summonerDatas['handsomehansen'].id);
-            var result = Object.keys($scope.summonerDatas);
-            $scope.result = result[0];
-            console.log('result is :' + $scope.result);
-            $scope.profileId = sumInfoService.getProfileId($scope.summonerDatas[$scope.result].profileIconId);
-            /*            sumInfoService.getPastGameInfo($scope.summonerDatas[$scope.result].id).then(function(response) {
-                         $scope.pastGameInfos = response.data['matches'];
-                         console.log($scope.pastGameInfos[0]);
-                        });*/
-
+            $scope.result = Object.keys($scope.summonerDatas)[0];
+            //console.log($scope.result.profileIconId);
+            $scope.profileId = $scope.summonerDatas[$scope.result].profileIconId;
+            console.log($scope.profileId);
         });
-
-        /*        sumInfoService.getChampions().then(function(response) {
-                    $scope.championDatas = response.data;
-                    console.log($scope.championDatas)
-                });*/
-        /*        sumInfoService.getPastGameInfo().then(function(response) {
-                    $scope.pastGameInfos = response.data;
-                    console.log($scope.pastGameInfos);
-                });*/
 
         function loadJSON(callback) {
             var xobj = new XMLHttpRequest();
@@ -127,10 +113,159 @@ angular
             xobj.send(null);
         }
 
-        function loadChampionData(callback) {
+        function removeDup(arr) {
+            var obj = {};
+            for (var i = 0; i < arr.length; i++) {
+                obj[arr[i]] = true;
+            }
+            return Object.keys(obj);
+        }
+
+
+        loadJSON(function(response) {
+            $scope.pastGameInfos = JSON.parse(response).matches;
+            $scope.champion = null;
+            $scope.championList = [];
+            $scope.championId = [];
+            $scope.championNameList = [];
+            $scope.spell1NameList = [];
+            $scope.spell2NameList = {};
+
+            $scope.spell1Id = [];
+            $scope.spell2Id = [];
+            console.log($scope.pastGameInfos);
+            for (var i = 0; i < $scope.pastGameInfos.length; i++) {
+                $scope.championList.push($scope.pastGameInfos[i]["matchMode"]);
+                $scope.championId.push($scope.pastGameInfos[i].participants[0]["championId"]);
+                $scope.spell1Id.push($scope.pastGameInfos[i].participants[0]["spell1Id"]);
+                $scope.spell2Id.push($scope.pastGameInfos[i].participants[0]["spell2Id"]);
+            }
+            console.log($scope.championList);
+            console.log($scope.championId);
+            console.log($scope.spell1Id);
+            console.log($scope.spell2Id);
+
+            console.log(removeDup($scope.spell1Id));
+            console.log(removeDup($scope.spell2Id));
+            console.log(removeDup($scope.championId));
+            $scope.noDupChampionId = removeDup($scope.championId);
+            $scope.noDupSpell1Id = removeDup($scope.spell1Id);
+            $scope.noDupSpell2Id = removeDup($scope.spell2Id);
+
+
+            for (var i = 0; i < $scope.noDupChampionId.length; i++) {
+                sumInfoService.getChampionName($scope.noDupChampionId[i]).then(function(response) {
+                    $scope.championNames = response.data;
+                    //console.log($scope.championNames);
+                    $scope.championNameList.push($scope.championNames.name);
+                });
+            }
+
+            for (var i = 0; i < $scope.noDupSpell1Id.length; i++) {
+                sumInfoService.getSummonerSpellName($scope.noDupSpell1Id[i]).then(function(response) {
+                    $scope.spell1Names = response.data;
+                    //console.log($scope.championNames);
+                    $scope.spell1NameList.push($scope.spell1Names.key);
+                });
+            }
+
+            for (var i = 0; i < $scope.noDupSpell2Id.length; i++) {
+                sumInfoService.getSummonerSpellName2($scope.noDupSpell2Id[i]).then(function(response) {
+                    $scope.spell2Names = response.data;
+                    //console.log($scope.championNames);
+                    //$scope.spell2NameList.push($scope.spell2Names.key);
+                    $scope.spell2NameList[$scope.noDupSpell2Id[0]] = $scope.spell2Names.key;
+                    console.log(JSON.stringify($scope.spell2NameList));
+                });
+            }
+
+            //console.log($scope.championNameList);
+
+            /*            var championNameList = [];
+                        $scope.championNames = null;
+                        $scope.participantRank = null;
+                        console.log($scope.pastGameInfos);
+                        for (var i = 0; i < $scope.pastGameInfos.length; i++) {
+                            $scope.champion = $scope.pastGameInfos[i].participants[0].championId;
+                            //console.log($scope.champion);
+                            $scope.participantRank = $scope.pastGameInfos[i].participants[0].highestAchievedSeasonTier;
+
+
+                            sumInfoService.getChampionName($scope.champion).then(function(response) {
+                                $scope.championNames = response.data;
+                                console.log($scope.championNames.name);
+                                //$scope.championNames = $scope.championNames.name;
+                                championNameList.push($scope.championNames.name);
+
+                            });
+                            championList.push($scope.champion);
+                        }
+                        console.log('array of champion ids', championList);
+                        console.log('array of champion names', championNameList);*/
+
+
+        });
+
+    })
+    .factory('sumInfoService', function($http, $q) {
+        return {
+            /*            getProfileId: function(profileIconId) {
+                            var defer = $q.defer();
+                            $http.get('http://ddragon.leagueoflegends.com/cdn/5.2.1/img/profileicon/' + profileIconId + '?api_key=7bb1997f-8ae8-47a6-ac69-5adf2ea7129e').then(function(response) {
+                                defer.resolve(response);
+                            });
+
+                            return defer.promise;
+                        },*/
+            getChampionName: function(championId) {
+                var defer = $q.defer();
+                $http.get('https://global.api.pvp.net/api/lol/static-data/na/v1.2/champion/' + championId + '?api_key=7bb1997f-8ae8-47a6-ac69-5adf2ea7129e').then(function(response) {
+                    defer.resolve(response);
+                });
+
+                return defer.promise;
+            },
+            getSummonerSpellName: function(spellId) {
+                var defer = $q.defer();
+                $http.get('https://global.api.pvp.net/api/lol/static-data/na/v1.2/summoner-spell/' + spellId + '?api_key=7bb1997f-8ae8-47a6-ac69-5adf2ea7129e').then(function(response) {
+                    defer.resolve(response);
+                });
+
+                return defer.promise;
+            },
+            getSummonerSpellName2: function(spellId) {
+                var defer = $q.defer();
+                $http.get('https://global.api.pvp.net/api/lol/static-data/na/v1.2/summoner-spell/' + spellId + '?api_key=7bb1997f-8ae8-47a6-ac69-5adf2ea7129e').then(function(response) {
+                    defer.resolve(response);
+                });
+
+                return defer.promise;
+            }
+        }
+    });
+//$route.current.params.name
+// Code here will be ignored by JSHint.
+/* jshint ignore:end */
+
+
+
+angular.module('quicksmite.gameInfo', []);
+// Code here will be linted with JSHint.
+/* jshint ignore:start */
+angular
+    .module('quicksmite.gameInfo', ['mm.foundation'])
+    .config(function($routeProvider) {
+        $routeProvider.when('gameInfo', {
+            templateUrl: 'gameInfo/gameInfo.html',
+            controller: 'gameInfoCtrl'
+        });
+    })
+    .controller('gameInfoCtrl', function($scope, $route, TodoService, gameInfoService) {
+
+        function loadJSON(callback) {
             var xobj = new XMLHttpRequest();
             xobj.overrideMimeType("application/json");
-            xobj.open('GET', '/resources/champion.json', true); // Replace 'my_data' with the path to your file
+            xobj.open('GET', '/resources/matchhistory.json', true); // Replace 'my_data' with the path to your file
             xobj.onreadystatechange = function() {
                 if (xobj.readyState == 4 && xobj.status == "200") {
                     // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
@@ -141,182 +276,100 @@ angular
         }
 
         loadJSON(function(response) {
-            // Parse JSON string into object
-            $scope.pastGameInfos = JSON.parse(response);
+            $scope.pastGameInfos = JSON.parse(response).matches;
+            $scope.championList = [];
+            $scope.championId = [];
+            $scope.kills = [];
+            $scope.assists = [];
+            $scope.deaths = [];
+            $scope.championLevel = [];
+            $scope.largestMultiKill = [];
+
             console.log($scope.pastGameInfos);
-            $scope.pastGameInfos = $scope.pastGameInfos['matches'][1];
-            $scope.secondDataSet = $scope.pastGameInfos;
+            for (var i = 0; i < $scope.pastGameInfos.length; i++) {
+                $scope.championList.push($scope.pastGameInfos[i]["matchMode"]);
+                $scope.championLevel.push($scope.pastGameInfos[i].participants[0]["stats"].champLevel);
+                $scope.kills.push($scope.pastGameInfos[i].participants[0]["stats"].kills);
+                $scope.assists.push($scope.pastGameInfos[i].participants[0]["stats"].assists);
+            }
+            console.log($scope.championList);
+            console.log($scope.championLevel);
+            console.log($scope.kills);
+            console.log($scope.assists);
 
-            $scope.participantData = $scope.secondDataSet.participants[0];
-            console.log($scope.participantData);
-
-            loadChampionData(function(response) {
-                $scope.championData = JSON.parse(response);
-                //console.log($scope.championData.data);
-
-                for (var champion in $scope.championData.data) {
-                    for (key in $scope.championData.data[champion]) {
-                        if ($scope.championData.data[champion].hasOwnProperty(key)) {
-                            //console.log(key + " key is " + $scope.championData.data[champion][key]);
-                            if ((key =='key') && ($scope.championData.data[champion][key] == $scope.participantData.championId)) {
-                                $scope.champion = sumInfoService.getChampionSquare(champion);
-                                console.log("found a match" + $scope.champion);
-                            }
-                        }
-                    }
-                }
-            });
-
-            loadJSON2(function(response) {
-                // Parse JSON string into object
-                $scope.spellIds = JSON.parse(response);
-                //console.log($scope.spellIds.data);
-
-                for (var spells in $scope.spellIds.data) {
-                    //console.log($scope.spellIds.data[spells]);
-                    for (key in $scope.spellIds.data[spells]) {
-                        if ($scope.spellIds.data[spells].hasOwnProperty(key)) {
-                            // console.log(key + " key is " + $scope.spellIds.data[spells][key]);
-                            if ((key == 'key') && ($scope.spellIds.data[spells][key] == $scope.participantData.spell1Id)) {
-                                $scope.spell1 = sumInfoService.getSpell1Id(spells);
-                                console.log("found a match" + $scope.spell1);
-                            }
-                        }
-                    }
-                }
-
-                for (var spells2 in $scope.spellIds.data) {
-                    //console.log($scope.spellIds.data[spells2]);
-                    for (key in $scope.spellIds.data[spells2]) {
-                        if ($scope.spellIds.data[spells2].hasOwnProperty(key)) {
-                            // console.log(key + " key is " + $scope.spellIds.data[spells][key]);
-                            if ((key == 'key') && ($scope.spellIds.data[spells2][key] == $scope.participantData.spell2Id)) {
-                                console.log("found a match" + spells2);
-                                $scope.spell2 = sumInfoService.getSpell2Id(spells2);
-                            }
-                        }
-                    }
-                }
-            });
         });
 
-        function loadJSON2(callback) {
-            var xobj = new XMLHttpRequest();
-            xobj.overrideMimeType("application/json");
-            xobj.open('GET', '/resources/summoner.json', true); // Replace 'my_data' with the path to your file
-            xobj.onreadystatechange = function() {
-                if (xobj.readyState == 4 && xobj.status == "200") {
-                    // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-                    callback(xobj.responseText);
-                }
-            };
-            xobj.send(null);
-        }
-
-
-
-
-
-
-        // for (var i in $scope.pastGameInfos) {
-        //     if (i == 'participantIdentities' || i == 'participants') {
-        //         delete $scope.pastGameInfos[i];
-        //     }
-        // }
-
     })
-    .factory('sumInfoService', function($http, $q) {
+    .factory('gameInfoService', function($http, $q) {
         return {
-            getProfileId: function(profileId) {
-                var img = $("<img />").attr('src', 'http://ddragon.leagueoflegends.com/cdn/5.3.1/img/profileicon/' + profileId + '.png')
-                    .load(function() {
-                        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
-                            alert('broken image!');
-                        } else {
-                            $("#something").append(img);
-                        }
-                    });
+            getChampionName: function(championId) {
+                var defer = $q.defer();
+                $http.get('https://global.api.pvp.net/api/lol/static-data/na/v1.2/champion/' + championId + '?api_key=7bb1997f-8ae8-47a6-ac69-5adf2ea7129e').then(function(response) {
+                    defer.resolve(response);
+                });
+
+                return defer.promise;
             },
-            getSpell1Id: function(spellId) {
-                var img2 = $("<img />").attr('src', 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/spell/' + spellId + '.png')
-                    .load(function() {
-                        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
-                            alert('broken image!');
-                        } else {
-                            $("#spells").append(img2);
-                        }
-                    });
+            getSummonerSpellName: function(spellId) {
+                var defer = $q.defer();
+                $http.get('https://global.api.pvp.net/api/lol/static-data/na/v1.2/summoner-spell/' + spellId + '?api_key=7bb1997f-8ae8-47a6-ac69-5adf2ea7129e').then(function(response) {
+                    defer.resolve(response);
+                });
+
+                return defer.promise;
             },
-            getSpell2Id: function(spellId) {
-                var img2 = $("<img />").attr('src', 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/spell/' + spellId + '.png')
-                    .load(function() {
-                        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
-                            alert('broken image!');
-                        } else {
-                            $("#spells2").append(img2);
-                        }
-                    });
-            },
-            getChampionSquare: function(championId) {
-                    var img = $("<img />").attr('src', 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/' + championId + '.png')
-                        .load(function() {
-                            if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
-                                alert('broken image!');
-                            } else {
-                                $("#championSquare").append(img);
-                            }
-                        });
-                }
-                /*            getPastGameInfo: function() {
-                                        var defer = $q.defer();
-                                        $http.get('/#/website/matchhistory.json').then(function(response) {
-                                            defer.resolve(response);
-                                        });
-                                        return defer.promise;
-                            }*/
-                //     getChampions: function() {
-                //         var defer = $q.defer();
-                //         $http.get('http://ddragon.leagueoflegends.com/cdn/5.2.1/data/en_US/champion.json').then(function(response) {
-                //             defer.resolve(response);
-                //         });
-                //         return defer.promise;
-                //     },
-                //     getPastGameInfo: function(summonerId) {
-                //         var defer = $q.defer();
-                //         $http.get('https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/' + summonerId + '?api_key=7bb1997f-8ae8-47a6-ac69-5adf2ea7129e').then(function(response) {
-                //             defer.resolve(response);
-                //         });
-                //         return defer.promise;
-                //     }
+            getSummonerSpellName2: function(spellId) {
+                var defer = $q.defer();
+                $http.get('https://global.api.pvp.net/api/lol/static-data/na/v1.2/summoner-spell/' + spellId + '?api_key=7bb1997f-8ae8-47a6-ac69-5adf2ea7129e').then(function(response) {
+                    defer.resolve(response);
+                });
+
+                return defer.promise;
+            }
         }
     });
 //$route.current.params.name
 // Code here will be ignored by JSHint.
 /* jshint ignore:end */
 
-
-
 angular.module('quicksmite', [
-  'ngRoute',
-  'quicksmite.todo',
-  'quicksmite.summonerInfo',
-  'mm.foundation'
-])
-.config(function ($routeProvider) {
-  'use strict';
-  $routeProvider
-    .when('/todo', {
-      controller: 'TodoCtrl',
-      templateUrl: '/quicksmite/todo/todo.html'
-    })
-    .when('/summonerInfo/:name', {
-      controller: 'sumInfoCtrl',
-      templateUrl: '/quicksmite/summonerInfo/summonerInfo.html'
-    })
-    .otherwise({
-      redirectTo: '/todo'
+        'ngRoute',
+        'quicksmite.todo',
+        'quicksmite.summonerInfo',
+        'quicksmite.gameInfo',
+        'mm.foundation'
+    ])
+    .config(function($routeProvider) {
+        'use strict';
+        $routeProvider
+            .when('/todo', {
+                controller: 'TodoCtrl',
+                templateUrl: '/quicksmite/todo/todo.html'
+            })
+            .when('/summonerInfo/:name', {
+                controller: 'sumInfoCtrl',
+                templateUrl: '/quicksmite/summonerInfo/summonerInfo.html'
+            })
+            .when('/gameInfo', {
+                controller: 'gameInfoCtrl',
+                templateUrl: '/quicksmite/gameInfo/gameInfo.html'
+            })
+            .otherwise({
+                redirectTo: '/todo'
+            });
     });
-});
+
+(function(module) {
+try {
+  module = angular.module('quicksmite');
+} catch (e) {
+  module = angular.module('quicksmite', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/quicksmite/gameInfo/gameInfo.html',
+    '<body><top-bar><ul class="title-area"><li class="name"><h1><a href="#/todo">My Site</a></h1></li><li toggle-top-bar class="menu-icon"><a href="#">Menu</a></li></ul><top-bar-section><ul class="right"><li class="active"><a href="#">Active</a></li><li has-dropdown><a href="#">Dropdown</a><ul top-bar-dropdown><li><a href="#">First link in dropdown</a></li></ul></li></ul><ul class="left"><li><a href="#">Left</a></li></ul></top-bar-section></top-bar><table class="responsive-summoner" ng-repeat="pastGameInfo in pastGameInfos track by $index" class="large-6 large-centered column"><thead><tr><th width="200">Champion Level</th><th width="200">Kills</th><th width="200">Assists</th></tr></thead><tbody><tr><td ng-bind="championLevel[$index]"></td><td ng-bind="kills[$index]"></td><td ng-bind="assists[$index]"></td></tr></tbody></table></body>');
+}]);
+})();
 
 (function(module) {
 try {
@@ -326,7 +379,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/quicksmite/summonerInfo/summonerInfo.html',
-    '<body><top-bar><ul class="title-area"><li class="name"><h1><a href="#/todo">My Site</a></h1></li><li toggle-top-bar class="menu-icon"><a href="#">Menu</a></li></ul><top-bar-section><ul class="right"><li class="active"><a href="#">Active</a></li><li has-dropdown><a href="#">Dropdown</a><ul top-bar-dropdown><li><a href="#">First link in dropdown</a></li></ul></li></ul><ul class="left"><li><a href="#">Left</a></li></ul></top-bar-section></top-bar><table class="large-6 columns large-offset-3"><thead><tr><th width="200">Summoner ID</th><th width="200">Summoner Name</th><th width="200">Profile Icon</th><th width="200">Summoner Level</th></tr></thead><tbody><tr><td>{{summonerDatas[result].id}}</td><td>{{summonerDatas[result].name}}</td><td><div id="something"></div></td><td>{{summonerDatas[result].summonerLevel}}</td></tr></tbody></table><br><table class="large-6 columns large-offset-3"><thead><tr><th width="200">Champion ID</th><th width="200">Rank</th><th width="200">Spell 1</th><th width="200">Spell 2</th></tr></thead><tbody><tr><td><div id="championSquare"></div></td><td>{{participantData.highestAchievedSeasonTier}}</td><td><div id="spells"></div></td><td><div id="spells2"></div></td></tr></tbody></table></body>');
+    '<body><top-bar><ul class="title-area"><li class="name"><h1><a href="#/todo">My Site</a></h1></li><li toggle-top-bar class="menu-icon"><a href="#">Menu</a></li></ul><top-bar-section><ul class="right"><li class="active"><a href="#">Active</a></li><li has-dropdown><a href="#">Dropdown</a><ul top-bar-dropdown><li><a href="#">First link in dropdown</a></li></ul></li></ul><ul class="left"><li><a href="#">Left</a></li></ul></top-bar-section></top-bar><table class="large-6 large-centered column"><thead><tr><th width="200">Summoner ID</th><th width="200">Summoner Name</th><th width="200">Profile Icon</th><th width="200">Summoner Level</th></tr></thead><tbody><tr><td>{{summonerDatas[result].id}}</td><td>{{summonerDatas[result].name}}</td><td><img ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/profileicon/{{profileId}}.png"></td><td>{{summonerDatas[result].summonerLevel}}</td></tr></tbody></table><table class="responsive-summoner" ng-repeat="pastGameInfo in pastGameInfos track by $index" class="large-6 large-centered column"><thead><tr><th width="200">Game Details</th><th width="200">Game Mode</th><th width="200">Champion ID</th><th width="200">Champion Photo</th><th width="200">Spell 1</th><th width="200">Spell 2</th></tr></thead><tbody><tr><td><a href="gameInfo/gameInfo.html">Game Summary<td></td><td ng-bind="championList[$index]"></td><td ng-bind="championId[$index]"></td><td><img ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/{{championNameList[$index]}}.png"></td><td><img ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/spell/{{spell1NameList[$index]}}.png"></td><td><img ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/spell/{{spell2NameList[$index].value}}.png"></td></a></td></tr></tbody></table></body>');
 }]);
 })();
 

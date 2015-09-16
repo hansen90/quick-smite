@@ -7,7 +7,6 @@
             <li toggle-top-bar class="menu-icon"><a href="#">Menu</a>
             </li>
         </ul>
-
         <top-bar-section>
             <!-- Right Nav Section -->
             <ul class="right">
@@ -21,7 +20,6 @@
                     </ul>
                 </li>
             </ul>
-
             <!-- Left Nav Section -->
             <ul class="left">
                 <li><a href="#">Left</a>
@@ -29,8 +27,7 @@
             </ul>
         </top-bar-section>
     </top-bar>
-
-    <table class="large-6 columns large-offset-3">
+    <table class="large-6 large-centered column">
         <thead>
             <tr>
                 <th width="200">Summoner ID</th>
@@ -41,16 +38,14 @@
         </thead>
         <tbody>
             <tr>
-                <td>{{summonerDatas[result].id}}</td>
-                <td>{{summonerDatas[result].name}}</td>
+                <td ng-bind="summonerDatas[result].id"></td>
+                <td ng-bind="summonerDatas[result].name"></td>
                 <td>
-                    <div id="something"></div>
+                    <img ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/profileicon/{{profileId}}.png" />
                 </td>
-                <td>{{summonerDatas[result].summonerLevel}}</td>
+                <td ng-bind="summonerDatas[result].summonerLevel"></td>
         </tbody>
     </table>
-<br>
-
     <!--     <table>
         <thead>
             <tr>
@@ -76,7 +71,7 @@
         </tbody>
     </table>
  -->
-<!--     <table>
+    <!--     <table>
         <thead>
             <tr>
                 <th ng-repeat="(key, value) in participantData" width="200">{{key}}</th>
@@ -89,35 +84,53 @@
             </tr>
         </tbody>
     </table> -->
-
-    <table class="responsive-summoner" ng-repeat="gameInfo in pastGameInfos track by $index" class="large-6 large-centered column">
+    <table class="responsive-summoner" ng-repeat="pastGameInfo in pastGameInfos track by $index" class="large-6 large-centered column">
         <thead>
             <tr>
+                <th width="200">Game Details</th>
                 <th width="200">Game Mode</th>
                 <th width="200">Champion ID</th>
-                <th width="200">Rank</th>
+                <th width="200">Champion Photo</th>
                 <th width="200">Spell 1</th>
                 <th width="200">Spell 2</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <pre ng-bind="gameInfo | json"></pre>
-            </tr>
-            <tr>
-                <td ng-bind="secondDataSet.queueType"></td>
+                <td><a href="gameInfo/gameInfo.html">Game Summary</td>
+                <td ng-bind="championList[$index]"></td>
+                <td ng-bind="championId[$index]"></td>
                 <td>
-                    <img ng-if="!!championNames[$index]" ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/{{championNames[$index]}}.png" />
-                </td>
-                <td>{{participantData.highestAchievedSeasonTier}}</td>
-                <td>
-                    <img ng-if="!!spell1Names[$index]" ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/spell/{{spell1Names[$index]}}.png" />
+                    <img ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/{{championNameList[$index]}}.png" />
                 </td>
                 <td>
-                   <img ng-if="!!spell2Names[$index]" ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/spell/{{spell2Names[$index]}}.png" />
+                    <img ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/spell/{{spell1NameList[$index]}}.png" />
+                </td>
+                <td>
+                    <img ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/spell/{{spell2Names.key}}.png" />
                 </td>
             </tr>
         </tbody>
     </table>
 
+        <table class="responsive-summoner" ng-repeat="pastGameInfo in pastGameInfos track by $index" class="large-6 large-centered column">
+        <thead>
+            <tr>
+                <th width="200">Champion Level</th>
+                <th width="200">Kills</th>
+                <th width="200">Deaths</th>
+                <th width="200">Assists</th>
+                <th width="200">KDA</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td ng-bind="championLevel[$index]"></td>
+                <td ng-bind="kills[$index]"></td>
+                <td ng-bind="deaths[$index]"></td>
+                <td ng-bind="assists[$index]"></td>
+                <td ng-bind="KDA[$index]"></td>
+            </tr>
+        </tbody>
+    </table>
 </body>

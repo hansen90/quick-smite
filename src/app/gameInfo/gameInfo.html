@@ -1,0 +1,46 @@
+<body>
+    <top-bar>
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="#/todo">My Site</a></h1>
+            </li>
+            <li toggle-top-bar class="menu-icon"><a href="#">Menu</a>
+            </li>
+        </ul>
+        <top-bar-section>
+            <!-- Right Nav Section -->
+            <ul class="right">
+                <li class="active"><a href="#">Active</a>
+                </li>
+                <li has-dropdown>
+                    <a href="#">Dropdown</a>
+                    <ul top-bar-dropdown>
+                        <li><a href="#">First link in dropdown</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <!-- Left Nav Section -->
+            <ul class="left">
+                <li><a href="#">Left</a>
+                </li>
+            </ul>
+        </top-bar-section>
+    </top-bar>
+    <table class="responsive-summoner" ng-repeat="pastGameInfo in pastGameInfos track by $index" class="large-6 large-centered column">
+        <thead>
+            <tr>
+                <th width="200">Champion Level</th>
+                <th width="200">Kills</th>
+                <th width="200">Assists</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td ng-bind="championLevel[$index]"></td>
+                <td ng-bind="kills[$index]"></td>
+                <td ng-bind="assists[$index]"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
